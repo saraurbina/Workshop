@@ -1,6 +1,8 @@
 ---
-title: "Untitled"
-output: github_document
+title: "Initial Markdown Document"
+author: "Sara Urbina"
+date: "August 10, 2018"
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
