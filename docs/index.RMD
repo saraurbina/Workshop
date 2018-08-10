@@ -2,31 +2,67 @@
 title: "Initial Markdown Document"
 author: "Sara Urbina"
 date: "August 10, 2018"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE, message=FALSE)
 ```
 
 ## GitHub Documents
 
-This report shows the bike count analysis for _Hawthorne_, _Tilikum_, and _Steel_ bridges in Portland Oregon. 
+This report shows the bike counts analysis for **_Hawthorne_**, **_Tilikum_**, and **_Steel_** bridges located in Portlan, Oregon. 
 
 ## Including Code
 
-You can include R code in the document as follows:
+The average daily bike counts for these bridges are:
 
-```{r cars}
-summary(cars)
+```{r bike counts, message=FALSE}
+library(readxl)
+library(lubridate)
+library(tidyverse)
+
+input_file <- "data/Hawthorne Tilikum Steel daily bike counts 073118.xlsx"
+bridge_name <- "Hawthorne"
+
+# define a funtion that load bike counts data
+load_data <- function(input_file, bridge_name) {
+  bikecounts <- read_excel(input_file,
+                           sheet = bridge_name,
+                           skip = 1)
+  bikecounts$name <- bridge_name
+  bikecounts
+}
+
+Tilikum <- load_data(input_file, "Tilikum")
+Hawthorne <- load_data(input_file, "Hawthorne")
+
+# use the column names of Tilikum for Hawthorne
+names(Hawthorne) <- names(Tilikum)
+
+Steel <- load_data(input_file, "Steel")
+names(Steel) <- c("date", "lower", "westbound", "eastbound", "total", "name")
+
+# combine all three data frame for all three bridges
+bikecounts <- bind_rows(Hawthorne, 
+                        Tilikum, 
+                        Steel %>% select(-lower)) # exclude the `lower` col in Steel data frame
+
+# average daily bike counts by bridge
+bikecounts %>% 
+  group_by(name) %>% 
+  summarize(avg_daily_counts=mean(total, na.rm=TRUE))
 ```
 
 ## Including Plots
 
-You can also embed plots, for example:
+Below is the bike counts line plot for three bridges:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r bikecounts}
+ggplot(bikecounts) +
+   geom_bar(mapping = aes(x = name, y = total, fill = name), stat = "identity")
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

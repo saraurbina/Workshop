@@ -50,8 +50,3 @@ bikecounts %>%
   #then average by month over years for each bridge
   group_by(name, month(ym)) %>% 
   summarize(avg_monthly_counts=mean(total_monthly_counts))
-
-  #Plot
-ggplot(data = Hawthorne) + geom_point(mapping = aes(x = date, y = total))
-ggplot(data = Hawthorne) + geom_point(mapping = aes(x = date, y = wb))
-ggplot(data = Hawthorne) + geom_point(mapping = aes(x = date, y = eb))
